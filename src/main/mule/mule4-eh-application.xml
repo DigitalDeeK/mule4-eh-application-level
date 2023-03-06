@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="http_error_response" doc:id="fab050ec-8ef5-4c1c-a9be-109bf192770c">
+		<http:listener doc:name="Get /example4" doc:id="2bc03fab-3ec9-4280-b069-82c361c68885" config-ref="HTTP_Listener_config" path="/example4">
+			<http:response statusCode="#[vars.httpStatus default 200]" />
+			<http:error-response statusCode="#[vars.httpStatus default 500]">
+				<http:body><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-payload value='#["Status: Flow Started. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Started  CorrelationId" doc:id="88ea2ded-e2f4-4a64-837c-1ee298a917de" />
+		<logger level="INFO" doc:name="payload" doc:id="701eda88-e411-40b9-bf1c-e587a1c26c69" message="#[payload]" />
+		<raise-error doc:name="ANY Type" doc:id="ae89fc62-6472-4a22-8967-6a4c2beded35" type="ANY" description="Error Description: This is an error as a result of the Raise error processor" />
+		<set-payload value='#["Status: Flow Completed. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Completed  CorrelationId" doc:id="02b63e54-978d-48fa-9488-c3af0b7c6cd4" />
+		<logger level="INFO" doc:name="payload" doc:id="c031e035-ecb6-4a28-ab2b-8e8f25572426" message="#[payload]" />
+	</flow>
+	<flow name="on_error_propagate_matchType" doc:id="00eb0ce5-e7be-4104-8beb-36e44b73f998" >
+		<http:listener doc:name="Get /example5" doc:id="adefb482-f6d0-404e-9343-115639f320c4" config-ref="HTTP_Listener_config" path="/example5" >
+			<http:response statusCode="#[vars.httpStatus default 200]" />
+			<http:error-response statusCode="#[vars.httpStatus default 500]" >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-payload value='#["Status: Flow Started. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Started  CorrelationId" doc:id="ad4b1255-daee-47cc-be53-bd1af13a0db4" />
+		<logger level="INFO" doc:name="payload" doc:id="5f98059c-aacf-478e-962e-e3a721333b69" message="#[payload]" />
+		<raise-error doc:name="ANY Type" doc:id="87817bc2-4ea5-451d-813b-75f419ceef52" type="ANY" description="Error Description: This is an error as a result of the Raise error processor" />
+		<set-payload value='#["Status: Flow Completed. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Completed  CorrelationId" doc:id="7aa38ec6-eaa4-4739-a1eb-53c23163c244" />
+		<logger level="INFO" doc:name="payload" doc:id="da56a559-4341-44b4-93b1-25d42b0d780e" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2997ec16-d927-44c6-b93d-d87eb50565eb" type="ANY">
+				<set-payload value='#["Status: Error Occurred! " ++ error.description as String]' doc:name="Error Occurred" doc:id="b8452163-fae2-4049-bd09-2b037a73746c" />
+				<logger level="INFO" doc:name="payload" doc:id="2c3ebb57-5390-415c-ad1b-83bd30afbb47" message="#[payload]"/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="on_error_propagate_NO_matchType" doc:id="dbbdaf22-8fcf-4518-aba7-69be8f24f2b6">
+		<http:listener doc:name="Get /example6" doc:id="3b729794-8e43-478b-a0e1-2734a66efa84" config-ref="HTTP_Listener_config" path="/example6" >
+			<http:response statusCode="#[vars.httpStatus default 200]" />
+			<http:error-response statusCode="#[vars.httpStatus default 500]" >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-payload value='#["Status: Flow Started. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Started  CorrelationId" doc:id="a98192ba-2feb-4a89-843d-fb90e73a8a94" />
+		<logger level="INFO" doc:name="payload" doc:id="c435e6d7-4ef3-4466-bec0-883663533f48" message="#[payload]" />
+		<raise-error doc:name="ANY Type" doc:id="73876262-2fb8-44d6-993a-9eeb4fef182b" type="ANY" description="Error Description: This is an error as a result of the Raise error processor" />
+		<set-payload value='#["Status: Flow Completed. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Completed  CorrelationId" doc:id="5b264102-78e2-49af-bae2-2896640b78ec" />
+		<logger level="INFO" doc:name="payload1" doc:id="42687ec3-2f29-4cb8-b216-07a79eb9aaa3" message="#[payload]" />
+		<error-handler>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="595312b1-617c-497a-97c7-d4aef45b35ac" type="STREAM_MAXIMUM_SIZE_EXCEEDED">
+				<set-payload value='#["Status: Error Occurred! " ++ error.description as String]' doc:name="Error Occurred" doc:id="7333296d-1c98-4312-bc2f-4e4633b1e37b" />
+				<logger level="INFO" doc:name="payload" doc:id="a8daf652-0c11-4850-9c60-e5afbb1f4e17" message="#[payload]" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="on_error_continue_matchType" doc:id="bdef01dd-c565-448a-ad3a-b120cd809b5d" >
+		<http:listener doc:name="Get /example7" doc:id="2fa51f7e-0cc0-426d-a2bf-5e183dd6d7c0" config-ref="HTTP_Listener_config" path="/example7" >
+			<http:response statusCode="#[vars.httpStatus default 200]" />
+			<http:error-response statusCode="#[vars.httpStatus default 500]" >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-payload value='#["Status: Flow Started. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Started  CorrelationId" doc:id="3e63647c-3ddd-42a6-8576-73e6f0cccc8c" />
+		<logger level="INFO" doc:name="payload" doc:id="a4465220-7ab5-4b60-8ea1-7734a05cc841" message="#[payload]" />
+		<raise-error doc:name="ANY Type" doc:id="7ad43927-457d-4ad6-a4e6-6b1d27caed6a" type="ANY" description="Error Description: This is an error as a result of the Raise error processor" />
+		<set-payload value='#["Status: Flow Completed. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Completed  CorrelationId" doc:id="8e0fd1d6-fda9-4e67-a04e-f8790369b57e" />
+		<logger level="INFO" doc:name="payload" doc:id="8ae8d520-d80c-47ab-935d-3e9ccca0071f" message="#[payload]" />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c67c5356-a8c9-47ef-ad53-8b7130a1257c" type="ANY" >
+				<set-payload value='#["Status: Error Occurred! " ++ error.description as String]' doc:name="Error Occurred" doc:id="70df2b02-9d94-4798-8e82-fffcbb4597c4" />
+				<logger level="INFO" doc:name="payload" doc:id="9f30ac36-c00b-4140-a305-0540e9be687d" message="#[payload]"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="on_error_continue_NO_matchType" doc:id="91755317-a5c5-4010-b6a3-371d59a7d4b8" >
+		<http:listener doc:name="Get /example8" doc:id="16be97cd-1fae-4ee5-857a-348de7a74187" config-ref="HTTP_Listener_config" path="/example8" >
+			<http:response statusCode="#[vars.httpStatus default 200]" />
+			<http:error-response statusCode="#[vars.httpStatus default 500]" >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-payload value='#["Status: Flow Started. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Started  CorrelationId" doc:id="3b048aa6-c805-4203-86eb-efb07f727948" />
+		<logger level="INFO" doc:name="payload" doc:id="405e2415-4058-46c4-ab1b-1e7d47f772bf" message="#[payload]" />
+		<raise-error doc:name="ANY Type" doc:id="27dae027-e73b-4f24-8661-23debb68ee93" type="ANY" description="Error Description: This is an error as a result of the Raise error processor" />
+		<set-payload value='#["Status: Flow Completed. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Completed  CorrelationId" doc:id="ea45c0d8-2992-42fd-9bd9-a2fdf43a1d0e" />
+		<logger level="INFO" doc:name="payload1" doc:id="7b17a665-87fc-460e-ad37-d35203b598fb" message="#[payload]" />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="117d14a8-14c4-41ec-9632-1f4dc2f44157" type="STREAM_MAXIMUM_SIZE_EXCEEDED" >
+				<set-payload value='#["Status: Error Occurred! " ++ error.description as String]' doc:name="Error Occurred" doc:id="f225d184-9fa3-4c96-bd91-a5294d66d50c" />
+				<logger level="INFO" doc:name="payload" doc:id="6a0d5835-613f-459d-bc6c-c558818e523b" message="#[payload]" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="parent-flow-on-error-propagate" doc:id="a28fff0c-2e20-4003-b556-573d24e24384" >
+		<http:listener doc:name="Get /example9" doc:id="c29bc9af-9842-4cf0-b654-3769f78eb31b" config-ref="HTTP_Listener_config" path="/example9" >
+			<http:response statusCode="#[vars.httpStatus default 200]" />
+			<http:error-response statusCode="#[vars.httpStatus default 500]" >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-payload value='#["Status: Flow Started. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Started  CorrelationId" doc:id="be54b50a-17dc-44f1-a374-4bf5b466de30" />
+		<logger level="INFO" doc:name="payload" doc:id="35a47b77-b336-475c-a18f-3cce592f7107" message="#[payload]" />
+		<flow-ref doc:name="child-flow-on-error-propagate" doc:id="1733f5de-b32b-41fc-9ed1-a948d80623fb" name="child-flow-on-error-propagate" />
+		<set-payload value='#["Status: Flow Completed. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Completed  CorrelationId" doc:id="1402aee1-742b-4024-ae56-2e15a046dcdb" />
+		<logger level="INFO" doc:name="payload1" doc:id="26b86b16-b883-4e59-9751-2f9f91d5a09d" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1ecc735b-d146-4f40-aa68-0047f76c3c76" type="ANY">
+				<set-payload value='#["Status: Error Occurred in Parent Flow! " ++ error.description as String]' doc:name="Error Occurred in Parent Flow" doc:id="49bd10ca-c148-439a-be5e-e53f862d4b19" />
+				<logger level="INFO" doc:name="payload" doc:id="32d0229c-12a3-4db0-aaeb-07c7e5469730" message="#[payload]" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="child-flow-on-error-propagate" doc:id="74a73115-08a3-4166-9d98-3895a373533e">
+		<set-payload value='#["Status: Child Flow Started. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Child Flow Started  CorrelationId" doc:id="7a989639-6b70-4c73-9704-c46e03151612" />
+		<raise-error doc:name="ANY Type" doc:id="9b46cf15-803d-4938-96d9-2b4267d1f688" type="ANY" description="Error Description: This is an error as a result of the Raise error processor" />
+		<set-payload value='#["Status: Child Flow Completed. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Child Flow Completed  CorrelationId" doc:id="3cc44228-57db-439a-a399-0a676f4b3b24" />
+		<logger level="INFO" doc:name="payload" doc:id="e919b4b9-9dfb-4f48-afb3-ba1f8e4863c3" message="#[payload]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="415d09b1-e013-4325-9c40-4b190834ed64" type="ANY">
+				<set-payload value='#["Status: Error Occurred in Child Flow! " ++ error.description as String]' doc:name="Error Occurred in Child Flow" doc:id="771e4cad-a461-405e-b6af-268ae6845ec9" />
+				<logger level="INFO" doc:name="payload" doc:id="96c7f1b6-e602-4f22-90d2-4175c5a869c9" message="#[payload]" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="parent-flow-on-error-continue" doc:id="f9074e98-2a29-4972-8c2a-1f60c3837d15" >
+		<http:listener doc:name="Get /example10" doc:id="576e063c-455e-4c76-96e1-d8759b9201c1" config-ref="HTTP_Listener_config" path="/example10" >
+			<http:response statusCode="#[vars.httpStatus default 200]" />
+			<http:error-response statusCode="#[vars.httpStatus default 500]" >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-payload value='#["Status: Flow Started. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Started  CorrelationId" doc:id="f1653046-4aa0-4434-b6c6-7c2e2223ef73" />
+		<logger level="INFO" doc:name="payload" doc:id="f1f04f92-f3ec-4b9c-8982-5cbc5dd12f5d" message="#[payload]" />
+		<flow-ref doc:name="child-flow-on-error-continue" doc:id="81d37031-c2f0-4120-bd7d-4a6042ef8443" name="child-flow-on-error-continue" />
+		<set-payload value='#["Status: Flow Completed. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Completed  CorrelationId" doc:id="aa40c3b8-6e4f-4d78-8c13-e380870826c9" />
+		<logger level="INFO" doc:name="payload" doc:id="653cdf34-b311-434d-8465-b1dedc95c11d" message="#[payload]" />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="2ac5f6b4-47dd-4590-880e-2c0ff5350bd5" type="ANY" >
+				<set-payload value='#["Status: Error Occurred in Parent Flow! " ++ error.description as String]' doc:name="Error Occurred in Parent Flow" doc:id="93e01907-906c-426e-92d6-aa8858506d60" />
+				<logger level="INFO" doc:name="payload" doc:id="e2513f02-cbfb-40d2-8f24-5e73065d743d" message="#[payload]" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="child-flow-on-error-continue" doc:id="c5e0ee5f-349e-4936-b213-e6dedcfeb94c" >
+		<set-payload value='#["Status: Child Flow Started. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Child Flow Started  CorrelationId" doc:id="7da89dd4-4cf6-4696-9f14-5b572ba5a04c" />
+		<raise-error doc:name="ANY Type" doc:id="2ef52df3-583f-4d96-b57e-faa973495364" type="ANY" description="Error Description: This is an error as a result of the Raise error processor" />
+		<set-payload value='#["Status: Child Flow Completed. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Child Flow Completed  CorrelationId" doc:id="7b8c7e53-604c-41a3-a476-650ab9ef1945" />
+		<logger level="INFO" doc:name="payload" doc:id="dded5818-4459-4946-8c7e-8222cbf079ec" message="#[payload]"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="17f536f4-cf2d-4888-a51b-6f75def374f6" type="ANY" >
+				<set-payload value='#["Status: Child Error Occurred! " ++ error.description as String]' doc:name="Child Error Occurred" doc:id="35aa70a1-5960-440d-99ee-197c5258c543" />
+				<logger level="INFO" doc:name="payload" doc:id="eca25c6c-841d-4bca-8bb8-b42000c5c4ed" message="#[payload]" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="override_http_status_code" doc:id="f046c163-0233-4e77-8d83-4e72effdf62a" >
+		<http:listener doc:name="Get /example11" doc:id="78b86a34-0f41-45a6-b341-2187848e2067" config-ref="HTTP_Listener_config" path="/example11" >
+			<http:response statusCode="#[vars.httpStatus default 200]" />
+			<http:error-response statusCode="#[vars.httpStatus default 500]" >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-payload value='#["Status: Flow Started. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Started  CorrelationId" doc:id="dc50a1a3-2ba3-45df-a8d9-166a3a2c5096" />
+		<logger level="INFO" doc:name="payload" doc:id="1e8c919d-c564-4bec-8d4b-4725985e7f66" message="#[payload]" />
+		<raise-error doc:name="BAD_REQUEST" doc:id="e4cf6e71-6bb7-4bd0-9316-f6373f6a99aa" type="HTTP:BAD_REQUEST_" description="Error Description: This is an error as a result of the Raise error processor" />
+		<set-payload value='#["Status: Flow Completed. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Completed  CorrelationId" doc:id="485780a5-6790-4e4a-b2b0-2d77cd54442e" />
+		<logger level="INFO" doc:name="payload1" doc:id="b6655974-a5ba-49b3-a018-f839f3091523" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="24220a24-62ba-4a5c-b5a2-c650c362fd2e" type="HTTP:BAD_REQUEST_" >
+				<set-payload value='#["Status: Error Occurred! " ++ error.description as String]' doc:name="Error Occurred" doc:id="bc30ba73-a5cb-49dc-b211-2580f8dccfe3" />
+				<set-variable value="400" doc:name="httpStatus" doc:id="22771e76-272c-42f9-928e-c99062b0f89d" variableName="httpStatus"/>
+				<logger level="INFO" doc:name="payload" doc:id="2d2df7fd-12c1-4508-a9e3-1f13891654c7" message="#[payload]" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="error-handling-processor-level" doc:id="5f026755-ee92-49f5-b7e5-06ac9ec529de" >
+		<http:listener doc:name="Get /example12" doc:id="646dcee4-e6d2-46b8-978c-48ade9c60ba2" config-ref="HTTP_Listener_config" path="/example12" >
+			<http:response statusCode="#[vars.httpStatus default 200]" />
+			<http:error-response statusCode="#[vars.httpStatus default 500]" >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-payload value='#["Status: Flow Started. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Started  CorrelationId" doc:id="343cfdfb-7635-405b-a889-c42c8d94371b" />
+		<logger level="INFO" doc:name="payload" doc:id="5ae70f3c-cca3-4df7-9ea0-f67e10689a0c" message="#[payload]" />
+		<try doc:name="Try" doc:id="e5c14b34-55a8-40e8-860e-00ad79bb2dd5" >
+			<raise-error doc:name="BAD_REQUEST" doc:id="911bc224-9d54-4aa8-98ff-79175f23aa2b" type="HTTP:BAD_REQUEST_" description="Error Description: This is an error as a result of the Raise error processor" />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="657d8bfb-b4b9-46df-a1d0-8d76f06b1ac3" type="ANY">
+					<set-payload value='#["Status: Error Occurred! " ++ error.description as String]' doc:name="Error Occurred" doc:id="8f5abc41-3846-4513-9115-f7fd7c5ed921" />
+					<logger level="INFO" doc:name="payload" doc:id="399d9d31-926c-4175-a79c-0dca09fd6fc9" message="#[payload]" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<set-payload value='#["Status: Flow Completed. Correlation Id is :" ++ correlationId as String]' doc:name="Status: Flow Completed  CorrelationId" doc:id="34fa88ce-7c15-4586-b75d-73e5cea318e9" />
+		<logger level="INFO" doc:name="payload1" doc:id="7a799fec-a621-486c-a50b-412cb947e784" message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="665826a9-578f-4bcb-bad7-2d5de1e1039c" type="HTTP:BAD_REQUEST_" >
+				<set-payload value='#["Status: Error Occurred! " ++ error.description as String]' doc:name="Error Occurred" doc:id="e0a80d36-c26a-49ea-96da-3f1e989d6dfa" />
+				<set-variable value="400" doc:name="httpStatus" doc:id="605a859f-aa2b-40cf-ab4f-8096b5a09390" variableName="httpStatus" />
+				<logger level="INFO" doc:name="payload" doc:id="18a68a16-771f-4e50-b45a-0771868dff49" message="#[payload]" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>
